@@ -18,13 +18,11 @@ const Header = () => {
             <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">How it Works</a>
             <a href="#features" className="text-white/80 hover:text-white transition-colors">Features</a>
             <a href="#demo" className="text-white/80 hover:text-white transition-colors">Demo</a>
-            <a href="#testimonials" className="text-white/80 hover:text-white transition-colors">Testimonials</a>
-            <a href="#contact" className="text-white/80 hover:text-white transition-colors">Contact</a>
           </nav>
           
           <div className="hidden md:flex items-center gap-4">
             <button className="text-white/80 hover:text-white transition-colors">Sign In</button>
-            <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-300">
+            <button className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 flex items-center gap-2">
               Get Started
             </button>
           </div>
@@ -46,11 +44,9 @@ const Header = () => {
               <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>How it Works</a>
               <a href="#features" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Features</a>
               <a href="#demo" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Demo</a>
-              <a href="#testimonials" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Testimonials</a>
-              <a href="#contact" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a>
               <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
                 <button className="text-white/80 hover:text-white transition-colors text-left">Sign In</button>
-                <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold w-full">
+                <button className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200">
                   Get Started
                 </button>
               </div>
