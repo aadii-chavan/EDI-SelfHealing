@@ -5,7 +5,9 @@ import App from './App.tsx';
 import Login from './routes/Login';
 import CreateAccount from './routes/CreateAccount';
 import Dashboard from './routes/Dashboard';
+import Workspace from './routes/Workspace';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProjectProvider } from './contexts/ProjectContext';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -13,12 +15,15 @@ const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
   { path: '/create-account', element: <CreateAccount /> },
   { path: '/dashboard', element: <Dashboard /> },
+  { path: '/workspace', element: <Workspace /> },
 ]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <ProjectProvider>
+        <RouterProvider router={router} />
+      </ProjectProvider>
     </AuthProvider>
   </StrictMode>
 );

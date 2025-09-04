@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Upload, Github, Shield, Bug, Zap } from 'lucide-react';
 import Header from '../components/Header';
 import Orb from '../components/Orb';
+import GitHubImportModal from '../components/GitHubImportModal';
 import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const stats = [
     { label: 'Bugs Fixed', value: '127', icon: Bug },
@@ -77,7 +79,10 @@ const Dashboard: React.FC = () => {
                   <p className="text-white/70">Connect your repository for automated analysis</p>
                 </div>
               </div>
-              <button className="w-full py-4 px-6 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 hover:bg-blue-600/30 hover:border-blue-500/60 transition-colors duration-200 flex items-center justify-center gap-2">
+              <button 
+                onClick={() => setIsImportModalOpen(true)}
+                className="w-full py-4 px-6 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 hover:bg-blue-600/30 hover:border-blue-500/60 transition-colors duration-200 flex items-center justify-center gap-2"
+              >
                 <Github className="w-5 h-5" />
                 Connect Repository
               </button>
@@ -141,6 +146,12 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* GitHub Import Modal */}
+      <GitHubImportModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
+      />
     </section>
   );
 };
