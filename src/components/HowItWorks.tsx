@@ -26,7 +26,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="relative bg-black" style={{ position: 'relative' }}>
+    <section id="how-it-works" className="relative bg-black" style={{ position: 'relative' }}>
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white/90 mb-6">
@@ -37,10 +37,10 @@ const HowItWorks = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
           {steps.map((step, index) => (
-            <div key={index} className="group relative">
-              <div className="bg-white/5 backdrop-blur-lg ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
+            <div key={index} className="group relative h-full">
+              <div className="h-full flex flex-col bg-white/5 backdrop-blur-lg ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
                 <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300">
                   <step.icon className="w-8 h-8 text-white/80" />
                 </div>

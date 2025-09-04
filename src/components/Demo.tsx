@@ -5,7 +5,7 @@ const Demo = () => {
   const [showBlur, setShowBlur] = React.useState(true);
 
   return (
-    <section className="py-24 bg-black">
+    <section id="demo" className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

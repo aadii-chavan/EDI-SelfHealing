@@ -31,7 +31,7 @@ const logos = [
 
 const Testimonials = () => {
   return (
-    <section className="py-24 bg-black">
+    <section id="testimonials" className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white/90 mb-6">

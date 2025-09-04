@@ -5,7 +5,6 @@ import HowItWorks from './components/HowItWorks';
 import Features from './components/Features';
 import Demo from './components/Demo';
 import Testimonials from './components/Testimonials';
-import CallToAction from './components/CallToAction';
 import Footer from './components/Footer';
 
 function App() {
@@ -17,7 +16,6 @@ function App() {
       <Features />
       <Demo />
       <Testimonials />
-      <CallToAction />
       <Footer />
     </div>
   );

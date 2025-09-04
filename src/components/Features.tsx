@@ -37,7 +37,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="py-24 bg-black relative overflow-hidden">
+    <section id="features" className="py-24 bg-black relative overflow-hidden">
       {/* Galaxy background */}
       <div className="absolute inset-0 pointer-events-none opacity-80">
         <Galaxy 
