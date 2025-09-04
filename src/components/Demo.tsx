@@ -51,12 +51,17 @@ const Demo = () => {
           </p>
         </div>
         
-        <section 
-          className="relative rounded-2xl max-w-5xl mx-auto min-h-[600px]"
+          <section 
+          className="relative rounded-2xl w-full min-h-[600px]"
         >
           {/* Threads background */}
-          <div className="absolute inset-0 -z-10">
-            <Threads amplitude={1} distance={0} enableMouseInteraction={true} />
+          <div className="absolute inset-0 z-0 opacity-30">
+            <Threads 
+              color={[0.2, 1.0, 0.6]} 
+              amplitude={1.5} 
+              distance={0.3} 
+              enableMouseInteraction={true} 
+            />
           </div>
 
           {/* Spotlight overlay removed for demo card */}
@@ -64,7 +69,7 @@ const Demo = () => {
           {/* Card wrapper (navbar-style glass) with terminal inside */}
           <AnimatedDemoCard>
             <div
-              className="relative h-full min-h-[320px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-0 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] will-change-transform"
+              className="relative h-full min-h-[320px] w-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 rounded-2xl p-0 overflow-hidden will-change-transform"
               onMouseMove={(e) => {
               const target = e.currentTarget as HTMLDivElement;
               const rect = target.getBoundingClientRect();
@@ -90,15 +95,15 @@ const Demo = () => {
             }}
             >
             {/* Terminal window */}
-            <div className="relative bg-black/90 rounded-xl overflow-hidden">
+            <div className="relative bg-transparent rounded-xl overflow-hidden">
             {/* Title bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-white/5 ring-1 ring-inset ring-white/10">
+            <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
                 <span className="w-3 h-3 rounded-full bg-yellow-500/80"></span>
                 <span className="w-3 h-3 rounded-full bg-green-500/80"></span>
               </div>
-              <div className="flex items-center gap-2 text-white/60 font-mono text-xs">
+              <div className="flex items-center gap-2 text-white/90 font-mono text-xs">
                 <Terminal className="w-4 h-4" />
                 self-healing — zsh
               </div>
@@ -106,18 +111,18 @@ const Demo = () => {
             </div>
 
             {/* Terminal body */}
-            <div className="p-5 md:p-6 font-mono text-[13px] leading-6 text-white/90">
+            <div className="p-5 md:p-6 font-mono text-[13px] leading-6 text-white">
               {/* Prompt 1 */}
               <div className="flex flex-wrap items-center gap-x-2">
                 <span className="text-emerald-400">adi@codemedic</span>
-                <span className="text-white/50">on</span>
+                <span className="text-white/70">on</span>
                 <span className="text-blue-400">~/projects/my-react-app</span>
-                <span className="text-white/50">via</span>
+                <span className="text-white/70">via</span>
                 <span className="text-fuchsia-400 inline-flex items-center gap-1"><GitBranch className="w-3.5 h-3.5" />main</span>
                 <span className="text-cyan-300">▸</span>
                 <span className="text-white">edirm scan --apply-fixes</span>
               </div>
-              <div className="mt-1 text-white/60">Uploading project archive: <span className="text-white">my-react-app.zip</span>…</div>
+              <div className="mt-1 text-white/90">Uploading project archive: <span className="text-white">my-react-app.zip</span>…</div>
 
               {/* Output (progressively revealed) */}
               <div className="mt-4 space-y-2">
@@ -132,9 +137,9 @@ const Demo = () => {
               {/* Prompt 2 */}
               <div className="mt-6 flex flex-wrap items-center gap-x-2">
                 <span className="text-emerald-400">adi@codemedic</span>
-                <span className="text-white/50">on</span>
+                <span className="text-white/70">on</span>
                 <span className="text-blue-400">~/projects/my-react-app</span>
-                <span className="text-white/50">via</span>
+                <span className="text-white/70">via</span>
                 <span className="text-fuchsia-400 inline-flex items-center gap-1"><GitBranch className="w-3.5 h-3.5" />main</span>
                 <span className="text-cyan-300">▸</span>
                 <span className="text-white">open https://your-app.cloud</span>

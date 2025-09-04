@@ -144,6 +144,15 @@ const Threads: React.FC<ThreadsProps> = ({
     gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
+    // Style the canvas to fill the container
+    gl.canvas.style.position = 'absolute';
+    gl.canvas.style.top = '0';
+    gl.canvas.style.left = '0';
+    gl.canvas.style.width = '100%';
+    gl.canvas.style.height = '100%';
+    gl.canvas.style.pointerEvents = enableMouseInteraction ? 'auto' : 'none';
+    
     container.appendChild(gl.canvas);
 
     const geometry = new Triangle(gl);
@@ -222,7 +231,20 @@ const Threads: React.FC<ThreadsProps> = ({
     };
   }, [color, amplitude, distance, enableMouseInteraction]);
 
-  return <div ref={containerRef} className="w-full h-full relative" {...rest} />;
+  return (
+    <div 
+      ref={containerRef} 
+      className="w-full h-full relative"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%'
+      }}
+      {...rest} 
+    />
+  );
 };
 
 export default Threads;

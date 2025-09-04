@@ -68,7 +68,7 @@ const Features = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
-            const { ref, inView } = useInView({ threshold: 0.2, once: true });
+            const { ref, inView } = useInView({ threshold: 0.1, once: true });
             return (
               <div
                 ref={ref as unknown as React.RefObject<HTMLDivElement>}
@@ -76,11 +76,9 @@ const Features = () => {
                 className="group relative h-full"
                 style={{
                   opacity: inView ? 1 : 0,
-                  transform: inView ? 'none' : 'translateY(24px) scale(0.98)',
-                  filter: inView ? 'blur(0px)' : 'blur(6px)',
-                  transition:
-                    'opacity 600ms ease, transform 600ms ease, filter 600ms ease',
-                  transitionDelay: `${index * 80}ms`
+                  transform: inView ? 'translateY(0px)' : 'translateY(32px)',
+                  transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transitionDelay: `${index * 150}ms`
                 }}
                 onMouseMove={(e) => {
                   const target = e.currentTarget as HTMLDivElement;
