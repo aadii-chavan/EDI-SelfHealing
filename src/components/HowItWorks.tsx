@@ -39,17 +39,48 @@ const HowItWorks = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
           {steps.map((step, index) => (
-            <div key={index} className="group relative h-full">
-              <div className="h-full flex flex-col bg-white/5 backdrop-blur-lg ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
-                <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300">
-                  <step.icon className="w-8 h-8 text-white/80" />
+            <div
+              key={index}
+              className="group relative h-full"
+              onMouseMove={(e) => {
+                const target = e.currentTarget as HTMLDivElement;
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                target.style.setProperty('--x', `${x}px`);
+                target.style.setProperty('--y', `${y}px`);
+              }}
+              onMouseLeave={(e) => {
+                const target = e.currentTarget as HTMLDivElement;
+                target.style.removeProperty('--x');
+                target.style.removeProperty('--y');
+              }}
+            >
+              {/* Spotlight hover overlay */}
+              <div
+                className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  background:
+                    'radial-gradient(240px circle at var(--x, -100px) var(--y, -100px), rgba(255,255,255,0.10), transparent 60%)'
+                }}
+              />
+
+              <div className="relative h-full min-h-[300px] flex flex-col items-center text-center bg-white/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
+
+                <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-xl flex items-center justify-center group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300 mb-5">
+                  <step.icon className="w-8 h-8 text-white/85" />
                 </div>
-                
-                <h3 className="text-xl font-semibold text-white mb-4">{step.title}</h3>
-                <p className="text-white/70 leading-relaxed">{step.description}</p>
-                
-                <div className="absolute -top-4 -left-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white font-bold text-sm ring-1 ring-white/20">
-                  {index + 1}
+
+                <h3 className="text-2xl font-semibold tracking-tight text-white mb-3">{step.title}</h3>
+                <p className="text-white/70 leading-relaxed text-base">
+                  {step.description}
+                </p>
+
+                <div className="mt-auto w-full">
+                  <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <div className="mt-4 text-white/50 text-sm">
+                    Step {index + 1} of {steps.length}
+                  </div>
                 </div>
               </div>
             </div>
