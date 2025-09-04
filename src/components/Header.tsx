@@ -6,7 +6,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
-    <header className="fixed top-0 w-full z-10">
+    <header className="fixed top-0 w-full z-50">
       <div className="max-w-7xl mx-auto px-6 py-2">
         <GlassSurface 
           width="100%"

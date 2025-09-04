@@ -29,10 +29,10 @@ const HowItWorks = () => {
     <section className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            How It <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Works</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white/90 mb-6">
+            How It <span className="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">Works</span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-white/70 max-w-3xl mx-auto">
             From broken code to production-ready in minutes. Our platform handles the complexity so you can focus on building.
           </p>
         </div>
@@ -40,15 +40,15 @@ const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="group relative">
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-8 hover:border-blue-500/50 transition-all duration-300 hover:bg-gray-800/70">
-                <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-purple-500/30 transition-all duration-300">
-                  <step.icon className="w-8 h-8 text-blue-400" />
+              <div className="bg-white/5 backdrop-blur-lg ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
+                <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-lg flex items-center justify-center mb-6 group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300">
+                  <step.icon className="w-8 h-8 text-white/80" />
                 </div>
                 
                 <h3 className="text-xl font-semibold text-white mb-4">{step.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{step.description}</p>
+                <p className="text-white/70 leading-relaxed">{step.description}</p>
                 
-                <div className="absolute -top-4 -left-4 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <div className="absolute -top-4 -left-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white font-bold text-sm ring-1 ring-white/20">
                   {index + 1}
                 </div>
               </div>
