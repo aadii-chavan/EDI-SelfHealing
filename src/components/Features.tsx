@@ -1,4 +1,5 @@
 import React from 'react';
+import { useInView } from '../hooks/useInView';
 import { Shield, Cloud, Zap, Server, Lock, RefreshCw } from 'lucide-react';
 import Galaxy from './Galaxy';
 
@@ -66,74 +67,85 @@ const Features = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="group relative h-full"
-              onMouseMove={(e) => {
-                const target = e.currentTarget as HTMLDivElement;
-                const rect = target.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                target.style.setProperty('--x', `${x}px`);
-                target.style.setProperty('--y', `${y}px`);
-                // compute tilt based on cursor position
-                const percentX = x / rect.width - 0.5;
-                const percentY = y / rect.height - 0.5;
-                const maxTilt = 8; // deg
-                const rotY = percentX * maxTilt; // left/right
-                const rotX = -percentY * maxTilt; // up/down (invert)
-                target.style.setProperty('--rx', `${rotX}deg`);
-                target.style.setProperty('--ry', `${rotY}deg`);
-              }}
-              onMouseLeave={(e) => {
-                const target = e.currentTarget as HTMLDivElement;
-                target.style.removeProperty('--x');
-                target.style.removeProperty('--y');
-                target.style.removeProperty('--rx');
-                target.style.removeProperty('--ry');
-              }}
-            >
-              {/* Background glow behind the card */}
+          {features.map((feature, index) => {
+            const { ref, inView } = useInView({ threshold: 0.2, once: true });
+            return (
               <div
-                aria-hidden
-                className="pointer-events-none absolute -inset-2 rounded-3xl -z-10 opacity-30 group-hover:opacity-60 blur-2xl transition-opacity duration-300"
+                ref={ref as unknown as React.RefObject<HTMLDivElement>}
+                key={index}
+                className="group relative h-full"
                 style={{
-                  background:
-                    'radial-gradient(120px 120px at 20% 20%, rgba(99,102,241,0.35), transparent 60%), radial-gradient(140px 140px at 80% 30%, rgba(168,85,247,0.32), transparent 65%), radial-gradient(160px 160px at 50% 80%, rgba(236,72,153,0.28), transparent 70%)'
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'none' : 'translateY(24px) scale(0.98)',
+                  filter: inView ? 'blur(0px)' : 'blur(6px)',
+                  transition:
+                    'opacity 600ms ease, transform 600ms ease, filter 600ms ease',
+                  transitionDelay: `${index * 80}ms`
                 }}
-              />
-              {/* Colorful spotlight hover overlay */}
-              <div
-                className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
-                style={{
-                  background:
-                    'radial-gradient(240px circle at var(--x, -100px) var(--y, -100px), rgba(99,102,241,0.18), rgba(168,85,247,0.14) 40%, rgba(236,72,153,0.12) 60%, transparent 70%)'
+                onMouseMove={(e) => {
+                  const target = e.currentTarget as HTMLDivElement;
+                  const rect = target.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  target.style.setProperty('--x', `${x}px`);
+                  target.style.setProperty('--y', `${y}px`);
+                  const percentX = x / rect.width - 0.5;
+                  const percentY = y / rect.height - 0.5;
+                  const maxTilt = 8;
+                  const rotY = percentX * maxTilt;
+                  const rotX = -percentY * maxTilt;
+                  target.style.setProperty('--rx', `${rotX}deg`);
+                  target.style.setProperty('--ry', `${rotY}deg`);
                 }}
-              />
-
-              <div className="relative z-10 h-full min-h-[280px] flex flex-col items-center text-center bg-white/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10 will-change-transform"
-                style={{
-                  transform:
-                    'perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
-                  transition: 'transform 120ms ease, box-shadow 200ms ease'
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget as HTMLDivElement;
+                  target.style.removeProperty('--x');
+                  target.style.removeProperty('--y');
+                  target.style.removeProperty('--rx');
+                  target.style.removeProperty('--ry');
                 }}
               >
-                <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-xl flex items-center justify-center group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300 mb-5">
-                  <feature.icon className="w-8 h-8 text-white/85" />
-                </div>
+                {/* Background glow behind the card */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-2 rounded-3xl -z-10 opacity-30 group-hover:opacity-60 blur-2xl transition-opacity duration-300"
+                  style={{
+                    background:
+                      'radial-gradient(120px 120px at 20% 20%, rgba(99,102,241,0.35), transparent 60%), radial-gradient(140px 140px at 80% 30%, rgba(168,85,247,0.32), transparent 65%), radial-gradient(160px 160px at 50% 80%, rgba(236,72,153,0.28), transparent 70%)'
+                  }}
+                />
+                {/* Colorful spotlight hover overlay */}
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
+                  style={{
+                    background:
+                      'radial-gradient(240px circle at var(--x, -100px) var(--y, -100px), rgba(99,102,241,0.18), rgba(168,85,247,0.14) 40%, rgba(236,72,153,0.12) 60%, transparent 70%)'
+                  }}
+                />
 
-                <h3 className="text-2xl font-semibold tracking-tight text-white mb-3">{feature.title}</h3>
-                <p className="text-white/70 leading-relaxed text-base">
-                  {feature.description}
-                </p>
+                <div className="relative z-10 h-full min-h-[280px] flex flex-col items-center text-center bg-white/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10 will-change-transform"
+                  style={{
+                    transform:
+                      'perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
+                    transition: 'transform 120ms ease, box-shadow 200ms ease'
+                  }}
+                >
+                  <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-xl flex items-center justify-center group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300 mb-5">
+                    <feature.icon className="w-8 h-8 text-white/85" />
+                  </div>
 
-                <div className="mt-auto w-full">
-                  <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <h3 className="text-2xl font-semibold tracking-tight text-white mb-3">{feature.title}</h3>
+                  <p className="text-white/70 leading-relaxed text-base">
+                    {feature.description}
+                  </p>
+
+                  <div className="mt-auto w-full">
+                    <div className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,6 +1,24 @@
 import React from 'react';
+import { useInView } from '../hooks/useInView';
 import { Terminal, CheckCircle, AlertTriangle, RefreshCw, GitBranch } from 'lucide-react';
 import Threads from './Threads';
+
+const AnimatedDemoCard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { ref, inView } = useInView({ threshold: 0.15, once: true });
+  return (
+    <div
+      ref={ref as unknown as React.RefObject<HTMLDivElement>}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'none' : 'translateY(28px) scale(0.96)',
+        filter: inView ? 'blur(0px)' : 'blur(8px)',
+        transition: 'opacity 700ms ease, transform 700ms ease, filter 700ms ease'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Demo = () => {
   const steps = [
@@ -44,9 +62,10 @@ const Demo = () => {
           {/* Spotlight overlay removed for demo card */}
 
           {/* Card wrapper (navbar-style glass) with terminal inside */}
-          <div
-            className="relative h-full min-h-[320px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-0 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] will-change-transform"
-            onMouseMove={(e) => {
+          <AnimatedDemoCard>
+            <div
+              className="relative h-full min-h-[320px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-0 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] will-change-transform"
+              onMouseMove={(e) => {
               const target = e.currentTarget as HTMLDivElement;
               const rect = target.getBoundingClientRect();
               const x = e.clientX - rect.left;
@@ -59,17 +78,17 @@ const Demo = () => {
               target.style.setProperty('--rx', `${rotX}deg`);
               target.style.setProperty('--ry', `${rotY}deg`);
             }}
-            onMouseLeave={(e) => {
+              onMouseLeave={(e) => {
               const target = e.currentTarget as HTMLDivElement;
               target.style.removeProperty('--rx');
               target.style.removeProperty('--ry');
             }}
-            style={{
+              style={{
               transform:
                 'perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
               transition: 'transform 120ms ease'
             }}
-          >
+            >
             {/* Terminal window */}
             <div className="relative bg-black/90 rounded-xl overflow-hidden">
             {/* Title bar */}
@@ -131,7 +150,8 @@ const Demo = () => {
               </div>
             </div>
             </div>
-          </div>
+            </div>
+          </AnimatedDemoCard>
         </section>
       </div>
     </section>
