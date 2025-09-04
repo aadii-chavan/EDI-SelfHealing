@@ -8,11 +8,11 @@ const AnimatedDemoCard: React.FC<{ children: React.ReactNode }> = ({ children })
   return (
     <div
       ref={ref as unknown as React.RefObject<HTMLDivElement>}
+      className="will-change-transform"
       style={{
         opacity: inView ? 1 : 0,
-        transform: inView ? 'none' : 'translateY(28px) scale(0.96)',
-        filter: inView ? 'blur(0px)' : 'blur(8px)',
-        transition: 'opacity 700ms ease, transform 700ms ease, filter 700ms ease'
+        transform: inView ? 'translate3d(0, 0, 0) scale3d(1, 1, 1)' : 'translate3d(0, 28px, 0) scale3d(0.96, 0.96, 1)',
+        transition: 'opacity 600ms cubic-bezier(0.4, 0, 0.2, 1), transform 600ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {children}
@@ -31,13 +31,73 @@ const Demo = () => {
     { icon: CheckCircle, text: 'Dev server running at https://your-app.cloud', color: 'text-emerald-300', iconClass: 'text-emerald-400' }
   ];
 
-  const [visibleCount, setVisibleCount] = React.useState(0);
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const rafId = React.useRef<number>();
+  const [userInput, setUserInput] = React.useState('');
+  const [isFocused, setIsFocused] = React.useState(false);
 
+  // Ultra-smooth mouse handler with enhanced RAF throttling
+  const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current || rafId.current) return;
+    
+    rafId.current = requestAnimationFrame(() => {
+      if (!cardRef.current) return;
+      
+      const rect = cardRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const percentX = (x / rect.width - 0.5) * 0.6; // Even more subtle
+      const percentY = (y / rect.height - 0.5) * 0.6;
+      const maxTilt = 3; // Reduced for ultra-smooth feel
+      const rotY = percentX * maxTilt;
+      const rotX = -percentY * maxTilt;
+      
+      // Use smoother easing with CSS transitions
+      cardRef.current.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) translate3d(0, 0, 0)`;
+      rafId.current = undefined;
+    });
+  }, []);
+
+  const handleMouseLeave = React.useCallback(() => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0)';
+  }, []);
+
+  // Handle terminal input
+  const handleTerminalClick = React.useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserInput(e.target.value);
+  }, []);
+
+  const handleInputFocus = React.useCallback(() => {
+    setIsFocused(true);
+  }, []);
+
+  const handleInputBlur = React.useCallback(() => {
+    setIsFocused(false);
+  }, []);
+
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Could add command processing logic here
+      setUserInput('');
+    }
+  }, []);
+
+  // Cleanup RAF on unmount
   React.useEffect(() => {
-    if (visibleCount >= steps.length) return;
-    const t = setTimeout(() => setVisibleCount((c) => c + 1), 900);
-    return () => clearTimeout(t);
-  }, [visibleCount, steps.length]);
+    return () => {
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, []);
 
   return (
     <section id="demo" className="py-24 bg-black">
@@ -69,30 +129,15 @@ const Demo = () => {
           {/* Card wrapper (navbar-style glass) with terminal inside */}
           <AnimatedDemoCard>
             <div
-              className="relative h-full min-h-[320px] w-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 rounded-2xl p-0 overflow-hidden will-change-transform"
-              onMouseMove={(e) => {
-              const target = e.currentTarget as HTMLDivElement;
-              const rect = target.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const y = e.clientY - rect.top;
-              const percentX = x / rect.width - 0.5;
-              const percentY = y / rect.height - 0.5;
-              const maxTilt = 6;
-              const rotY = percentX * maxTilt;
-              const rotX = -percentY * maxTilt;
-              target.style.setProperty('--rx', `${rotX}deg`);
-              target.style.setProperty('--ry', `${rotY}deg`);
-            }}
-              onMouseLeave={(e) => {
-              const target = e.currentTarget as HTMLDivElement;
-              target.style.removeProperty('--rx');
-              target.style.removeProperty('--ry');
-            }}
+              ref={cardRef}
+              className="relative h-full min-h-[320px] w-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-300 rounded-2xl p-0 overflow-hidden will-change-transform transform-gpu cursor-text"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onClick={handleTerminalClick}
               style={{
-              transform:
-                'perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
-              transition: 'transform 120ms ease'
-            }}
+                transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0)',
+                transition: 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 300ms ease'
+              }}
             >
             {/* Terminal window */}
             <div className="relative bg-transparent rounded-xl overflow-hidden">
@@ -124,9 +169,9 @@ const Demo = () => {
               </div>
               <div className="mt-1 text-white/90">Uploading project archive: <span className="text-white">my-react-app.zip</span>…</div>
 
-              {/* Output (progressively revealed) */}
+              {/* Output (all commands visible immediately) */}
               <div className="mt-4 space-y-2">
-                {steps.slice(0, visibleCount).map((s, i) => (
+                {steps.map((s, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <s.icon className={`w-4 h-4 ${s.iconClass} ${s.spin ? 'animate-spin' : ''}`} />
                     <span className={s.color}>{s.text}</span>
@@ -143,11 +188,34 @@ const Demo = () => {
                 <span className="text-fuchsia-400 inline-flex items-center gap-1"><GitBranch className="w-3.5 h-3.5" />main</span>
                 <span className="text-cyan-300">▸</span>
                 <span className="text-white">open https://your-app.cloud</span>
-                {visibleCount < steps.length ? (
-                  <span className="ml-2 inline-block w-2 h-4 bg-white/40 rounded-[1px]"></span>
-                ) : (
-                  <span className="ml-2 inline-block w-2 h-4 bg-white/70 animate-pulse rounded-[1px]"></span>
-                )}
+              </div>
+
+              {/* Interactive terminal input */}
+              <div className="mt-4 flex flex-wrap items-center gap-x-2">
+                <span className="text-emerald-400">adi@codemedic</span>
+                <span className="text-white/70">on</span>
+                <span className="text-blue-400">~/projects/my-react-app</span>
+                <span className="text-white/70">via</span>
+                <span className="text-fuchsia-400 inline-flex items-center gap-1"><GitBranch className="w-3.5 h-3.5" />main</span>
+                <span className="text-cyan-300">▸</span>
+                <div className="relative flex-1 min-w-0">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={userInput}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    onKeyDown={handleKeyDown}
+                    className="bg-transparent border-none outline-none text-white font-mono text-[13px] leading-6 w-full min-w-0 placeholder-white/40"
+                    placeholder="Type a command..."
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                  {!isFocused && userInput === '' && (
+                    <span className="absolute left-0 top-0 inline-block w-2 h-4 bg-white/70 animate-pulse rounded-[1px] pointer-events-none"></span>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 border-t border-white/10 pt-4 text-emerald-300">
