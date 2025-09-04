@@ -21,6 +21,10 @@
   }
 }
 
+html, body {
+  background: #000 !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

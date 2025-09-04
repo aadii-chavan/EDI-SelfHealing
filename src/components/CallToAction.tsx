@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 const CallToAction = () => {
   return (
-    <section className="py-24 bg-gradient-to-r from-blue-900 via-purple-900 to-green-900 relative overflow-hidden">
+    <section className="py-24 bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-green-500/10 animate-pulse"></div>
       
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
