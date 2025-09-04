@@ -1,8 +1,15 @@
 import React from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setIsMenuOpen(false);
+  };
 
   return (
     <header className="fixed top-2 w-full z-50">
@@ -21,10 +28,25 @@ const Header = () => {
           </nav>
           
           <div className="hidden md:flex items-center gap-4">
-            <a href="/login" className="text-white/80 hover:text-white transition-colors">Sign In</a>
-            <a href="/create-account" className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 flex items-center gap-2">
-              Get Started
-            </a>
+            {user ? (
+              <>
+                <a href="/dashboard" className="text-white/80 hover:text-white transition-colors">Dashboard</a>
+                <button 
+                  onClick={handleLogout}
+                  className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="text-white/80 hover:text-white transition-colors">Sign In</a>
+                <a href="/create-account" className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 flex items-center gap-2">
+                  Get Started
+                </a>
+              </>
+            )}
           </div>
           
           <button 
@@ -45,10 +67,25 @@ const Header = () => {
               <a href="/#features" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Features</a>
               <a href="/#demo" className="text-white/80 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Demo</a>
               <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
-                <a href="/login" className="text-white/80 hover:text-white transition-colors text-left">Sign In</a>
-                <a href="/create-account" className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 text-center">
-                  Get Started
-                </a>
+                {user ? (
+                  <>
+                    <a href="/dashboard" className="text-white/80 hover:text-white transition-colors text-left" onClick={() => setIsMenuOpen(false)}>Dashboard</a>
+                    <button 
+                      onClick={handleLogout}
+                      className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 text-center flex items-center justify-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <a href="/login" className="text-white/80 hover:text-white transition-colors text-left">Sign In</a>
+                    <a href="/create-account" className="group px-6 py-3 rounded-full text-white/90 border border-white/20 hover:border-white/40 hover:bg-white/5 transition-colors duration-200 text-center">
+                      Get Started
+                    </a>
+                  </>
+                )}
               </div>
             </nav>
           </div>
