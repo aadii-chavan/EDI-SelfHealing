@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, X, Cpu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -9,10 +9,8 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 py-2">
         <div className="flex items-center justify-between h-16 w-full px-6 rounded-full bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg">
-              <Cpu className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">HealCode</span>
+            <img src="/assets/grok.jpeg" alt="CodeMedic logo" className="w-8 h-8 rounded" />
+            <span className="text-xl font-bold text-white">CodeMedic</span>
           </div>
           
           <nav className="hidden md:flex items-center gap-10">

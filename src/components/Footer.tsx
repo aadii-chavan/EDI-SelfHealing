@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -8,10 +8,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg">
-                <Cpu className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white/90">HealCode</span>
+              <img src="/assets/grok.jpeg" alt="CodeMedic logo" className="w-8 h-8 rounded" />
+              <span className="text-xl font-bold text-white/90">CodeMedic</span>
             </div>
             <p className="text-white/70 mb-6 max-w-md leading-relaxed">
               The future of software development. Automatically heal your code with AI-powered 
@@ -56,7 +54,7 @@ const Footer = () => {
         
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/60 text-sm">
-            © 2025 HealCode. All rights reserved.
+            © 2025 CodeMedic. All rights reserved.
           </p>
           <div className="flex items-center gap-6 mt-4 md:mt-0 text-sm text-white/60">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

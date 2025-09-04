@@ -1,5 +1,6 @@
 import React from 'react';
 import { Upload, Search, Wrench, Rocket } from 'lucide-react';
+import GradualBlur from './GradualBlur';
 
 const steps = [
   {
@@ -26,8 +27,8 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-24 bg-black">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="relative bg-black overflow-hidden" style={{ position: 'relative' }}>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white/90 mb-6">
             How It <span className="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">Works</span>
@@ -56,6 +57,31 @@ const HowItWorks = () => {
           ))}
         </div>
       </div>
+
+      {/* Gradual blur overlay at bottom to blend into next section */}
+      <GradualBlur
+        target="parent"
+        position="bottom"
+        height="6rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential={true}
+        opacity={1}
+        style={{ pointerEvents: 'none' }}
+      />
+      {/* Optional top fade-in for the section */}
+      <GradualBlur
+        target="parent"
+        position="top"
+        height="6rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential={true}
+        opacity={1}
+        style={{ pointerEvents: 'none' }}
+      />
     </section>
   );
 };
