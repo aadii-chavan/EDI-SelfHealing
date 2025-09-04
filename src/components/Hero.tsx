@@ -1,25 +1,21 @@
 import React from 'react';
 import { ArrowRight, Play } from 'lucide-react';
-import Squares from './Squares';
+import Orb from './Orb';
 
 const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* Animated background elements */}
+      {/* Orb background */}
       <div className="absolute inset-0">
-        <Squares 
-          speed={0.5}
-          squareSize={40}
-          direction='diagonal'
-          borderColor='#ffffff33'
-          hoverFillColor='#222'
+        <Orb 
+          hoverIntensity={0.5}
+          rotateOnHover={true}
+          hue={0}
+          forceHoverState={false}
         />
       </div>
       {/* Bottom fade to blend into next section */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-black"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 animate-pulse"></div>
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl animate-float-delayed"></div>
       
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-white/80 text-sm mb-6 backdrop-blur-sm">
