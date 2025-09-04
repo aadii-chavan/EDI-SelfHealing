@@ -1,19 +1,8 @@
 import React from 'react';
 import { Terminal, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import GradualBlur from './GradualBlur';
-import ShapeBlur from './ShapeBlur';
 
 const Demo = () => {
   const [showBlur, setShowBlur] = React.useState(true);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setShowBlur(window.scrollY < 10);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <section className="py-24 bg-black">
@@ -27,7 +16,7 @@ const Demo = () => {
           </p>
         </div>
         
-        <section className="relative overflow-hidden rounded-2xl max-w-5xl mx-auto">
+        <section className="relative rounded-2xl max-w-5xl mx-auto">
           <div className="bg-white/5 backdrop-blur-lg ring-1 ring-white/10 p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-6">
               <Terminal className="w-6 h-6 text-green-400" />
@@ -69,34 +58,7 @@ const Demo = () => {
             </div>
           </div>
 
-          {/* ShapeBlur overlay for reveal effect */}
-          <div className="pointer-events-none absolute inset-0">
-            <ShapeBlur
-              variation={0}
-              pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1}
-              shapeSize={0.5}
-              roundness={0.5}
-              borderSize={0.05}
-              circleSize={0.5}
-              circleEdge={1}
-              className={showBlur ? 'opacity-100 transition-opacity duration-500' : 'opacity-0 transition-opacity duration-700'}
-            />
-          </div>
-
-          <GradualBlur
-            target="parent"
-            position="bottom"
-            height="6rem"
-            strength={2}
-            divCount={5}
-            curve="bezier"
-            exponential={true}
-            opacity={showBlur ? 1 : 0}
-            animated={true}
-            duration="0.6s"
-            easing="ease-out"
-            style={{ pointerEvents: 'none' }}
-          />
+          {/* simplified: removed blur overlays */}
         </section>
       </div>
     </section>
