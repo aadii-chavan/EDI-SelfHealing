@@ -44,7 +44,32 @@ const Demo = () => {
           {/* Spotlight overlay removed for demo card */}
 
           {/* Card wrapper (navbar-style glass) with terminal inside */}
-          <div className="relative h-full min-h-[320px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-0 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+          <div
+            className="relative h-full min-h-[320px] bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-0 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] will-change-transform"
+            onMouseMove={(e) => {
+              const target = e.currentTarget as HTMLDivElement;
+              const rect = target.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              const percentX = x / rect.width - 0.5;
+              const percentY = y / rect.height - 0.5;
+              const maxTilt = 6;
+              const rotY = percentX * maxTilt;
+              const rotX = -percentY * maxTilt;
+              target.style.setProperty('--rx', `${rotX}deg`);
+              target.style.setProperty('--ry', `${rotY}deg`);
+            }}
+            onMouseLeave={(e) => {
+              const target = e.currentTarget as HTMLDivElement;
+              target.style.removeProperty('--rx');
+              target.style.removeProperty('--ry');
+            }}
+            style={{
+              transform:
+                'perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
+              transition: 'transform 120ms ease'
+            }}
+          >
             {/* Terminal window */}
             <div className="relative bg-black/90 rounded-xl overflow-hidden">
             {/* Title bar */}

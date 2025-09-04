@@ -77,11 +77,21 @@ const Features = () => {
                 const y = e.clientY - rect.top;
                 target.style.setProperty('--x', `${x}px`);
                 target.style.setProperty('--y', `${y}px`);
+                // compute tilt based on cursor position
+                const percentX = x / rect.width - 0.5;
+                const percentY = y / rect.height - 0.5;
+                const maxTilt = 8; // deg
+                const rotY = percentX * maxTilt; // left/right
+                const rotX = -percentY * maxTilt; // up/down (invert)
+                target.style.setProperty('--rx', `${rotX}deg`);
+                target.style.setProperty('--ry', `${rotY}deg`);
               }}
               onMouseLeave={(e) => {
                 const target = e.currentTarget as HTMLDivElement;
                 target.style.removeProperty('--x');
                 target.style.removeProperty('--y');
+                target.style.removeProperty('--rx');
+                target.style.removeProperty('--ry');
               }}
             >
               {/* Background glow behind the card */}
@@ -102,7 +112,13 @@ const Features = () => {
                 }}
               />
 
-              <div className="relative z-10 h-full min-h-[280px] flex flex-col items-center text-center bg-white/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10">
+              <div className="relative z-10 h-full min-h-[280px] flex flex-col items-center text-center bg-white/5 backdrop-blur-md ring-1 ring-white/10 rounded-2xl p-8 hover:ring-white/20 transition-all duration-300 hover:bg-white/10 will-change-transform"
+                style={{
+                  transform:
+                    'perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))',
+                  transition: 'transform 120ms ease, box-shadow 200ms ease'
+                }}
+              >
                 <div className="bg-gradient-to-br from-white/10 to-white/5 w-16 h-16 rounded-xl flex items-center justify-center group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300 mb-5">
                   <feature.icon className="w-8 h-8 text-white/85" />
                 </div>
