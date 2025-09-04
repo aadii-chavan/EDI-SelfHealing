@@ -57,7 +57,7 @@ const Demo = () => {
           {/* Threads background */}
           <div className="absolute inset-0 z-0 opacity-30">
             <Threads 
-              color={[0.2, 1.0, 0.6]} 
+              color={[1.0, 1.0, 1.0]} 
               amplitude={1.5} 
               distance={0.3} 
               enableMouseInteraction={true} 
