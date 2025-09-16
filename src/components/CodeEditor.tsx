@@ -145,7 +145,7 @@ const CodeEditor: React.FC = () => {
         ) : (
           <div className="h-full">
             {/* Line Numbers */}
-            <div className="flex h-full">
+            <div className="flex h-full overflow-auto">
               <div className="bg-gray-800/30 border-r border-white/5 px-3 py-4 select-none">
                 <div className="font-mono text-xs text-white/40 leading-6">
                   {content.split('\n').map((_, index) => (
@@ -157,7 +157,7 @@ const CodeEditor: React.FC = () => {
               </div>
               
               {/* Code Content */}
-              <div className="flex-1 overflow-auto">
+              <div className="flex-1">
                 <pre className="font-mono text-sm text-white/90 p-4 leading-6 whitespace-pre-wrap">
                   <code>{content || '// File is empty'}</code>
                 </pre>
