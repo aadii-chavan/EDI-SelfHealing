@@ -36,6 +36,8 @@ export default function Orb({
     uniform float hover;
     uniform float rot;
     uniform float hoverIntensity;
+    uniform vec2 mousePos;
+    uniform float mouseDistance;
     varying vec2 vUv;
 
     vec3 rgb2yiq(vec3 c) {
@@ -119,6 +121,35 @@ export default function Orb({
       return intensity / (1.0 + dist * dist * attenuation);
     }
     
+    vec2 applyDistortion(vec2 uv, vec2 mousePos, float mouseDistance, float time) {
+      // Calculate distance from current pixel to mouse position
+      float distToMouse = distance(uv, mousePos);
+      
+      // Create distortion effect that's stronger when mouse is closer
+      float maxDistortionRadius = 0.8; // Maximum radius for distortion effect
+      float distortionStrength = 1.0 - smoothstep(0.0, maxDistortionRadius, distToMouse);
+      
+      // Apply stronger distortion when mouse is inside the orb circle
+      float orbRadius = 0.6;
+      float mouseInOrb = 1.0 - smoothstep(0.0, orbRadius, mouseDistance);
+      distortionStrength *= (1.0 + mouseInOrb * 2.0);
+      
+      // Create ripple effect
+      float ripple = sin(distToMouse * 15.0 - time * 8.0) * 0.02;
+      
+      // Create swirl effect
+      float angle = atan(uv.y - mousePos.y, uv.x - mousePos.x);
+      float swirl = sin(angle * 3.0 + time * 2.0) * 0.03;
+      
+      // Combine effects
+      vec2 distortion = vec2(
+        (ripple + swirl) * distortionStrength,
+        (ripple - swirl * 0.5) * distortionStrength
+      );
+      
+      return uv + distortion;
+    }
+    
     vec4 draw(vec2 uv) {
       vec3 color1 = adjustHue(baseColor1, hue);
       vec3 color2 = adjustHue(baseColor2, hue);
@@ -157,13 +188,18 @@ export default function Orb({
       float size = min(iResolution.x, iResolution.y);
       vec2 uv = (fragCoord - center) / size * 2.0;
       
+      // Apply rotation
       float angle = rot;
       float s = sin(angle);
       float c = cos(angle);
       uv = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);
       
-      uv.x += hover * hoverIntensity * 0.1 * sin(uv.y * 10.0 + iTime);
-      uv.y += hover * hoverIntensity * 0.1 * sin(uv.x * 10.0 + iTime);
+      // Apply cursor-based distortion
+      uv = applyDistortion(uv, mousePos, mouseDistance, iTime);
+      
+      // Apply original hover distortion (reduced intensity)
+      uv.x += hover * hoverIntensity * 0.05 * sin(uv.y * 10.0 + iTime);
+      uv.y += hover * hoverIntensity * 0.05 * sin(uv.x * 10.0 + iTime);
       
       return draw(uv);
     }
@@ -189,15 +225,17 @@ export default function Orb({
       vertex: vert,
       fragment: frag,
       uniforms: {
-        iTime: { value: 0 },
-        iResolution: {
-          value: new Vec3(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
-        },
-        hue: { value: hue },
-        hover: { value: 0 },
-        rot: { value: 0 },
-        hoverIntensity: { value: hoverIntensity }
-      }
+          iTime: { value: 0 },
+          iResolution: {
+            value: new Vec3(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
+          },
+          hue: { value: hue },
+          hover: { value: 0 },
+          rot: { value: 0 },
+          hoverIntensity: { value: hoverIntensity },
+          mousePos: { value: [0, 0] },
+          mouseDistance: { value: 1.0 }
+        }
     });
 
     const mesh = new Mesh(gl, { geometry, program });
@@ -219,9 +257,29 @@ export default function Orb({
     let lastTime = 0;
     let currentRot = 0;
     const rotationSpeed = 0.3;
+    let mouseX = 0;
+    let mouseY = 0;
 
-    const handleMouseMove = () => {
-      // Cursor movement over container triggers distortion
+    const handleMouseMove = (event: any) => {
+      if (!container) return;
+      
+      const rect = container.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Convert mouse position to normalized coordinates (-1 to 1)
+      const size = Math.min(rect.width, rect.height);
+      mouseX = ((event.clientX - centerX) / size) * 2;
+      mouseY = (-(event.clientY - centerY) / size) * 2; // Flip Y axis
+      
+      // Calculate distance from center (for determining if mouse is in orb)
+      const mouseDistance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+      
+      // Update shader uniforms
+      program.uniforms.mousePos.value = [mouseX, mouseY];
+      program.uniforms.mouseDistance.value = mouseDistance;
+      
+      // Trigger hover effect
       targetHover = 1;
     };
 
@@ -231,6 +289,9 @@ export default function Orb({
 
     const handleMouseLeave = () => {
       targetHover = 0;
+      // Reset mouse position when leaving
+      program.uniforms.mousePos.value = [0, 0];
+      program.uniforms.mouseDistance.value = 1.0;
     };
 
     container.addEventListener('mousemove', handleMouseMove);

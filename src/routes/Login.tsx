@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       if (success) {
         navigate('/');
       } else {
-        setError('Invalid credentials. Use: test@email.com / 001001');
+        setError('Invalid credentials.');
       }
     } catch (error: any) {
       setError(error.message || 'An error occurred during sign in');
@@ -45,11 +45,6 @@ const Login: React.FC = () => {
       <div className="relative z-10 flex items-center justify-center px-6 pt-24 pb-12 min-h-screen">
         <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-white/30 transition-colors duration-200 rounded-2xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] text-white">
           <h1 className="text-2xl font-semibold mb-6">Sign in</h1>
-          <div className="mb-4 p-3 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-200 text-sm">
-            <p className="font-medium mb-1">Demo Credentials:</p>
-            <p>Email: test@email.com</p>
-            <p>Password: 001001</p>
-          </div>
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
               {error}
@@ -65,7 +60,7 @@ const Login: React.FC = () => {
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-2 rounded-lg bg-black/40 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50" 
-                placeholder="test@email.com" 
+                placeholder="Enter your email" 
               />
             </div>
             <div>
@@ -77,7 +72,7 @@ const Login: React.FC = () => {
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-2 rounded-lg bg-black/40 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50" 
-                placeholder="001001" 
+                placeholder="Enter your password" 
               />
             </div>
             <button 
