@@ -140,7 +140,7 @@ const FileExplorer: React.FC = () => {
   };
 
   return (
-    <div className="w-64 bg-gray-900/50 border-r border-white/10 flex flex-col">
+    <div className="w-64 bg-gray-900/50 border-r border-white/10 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-3 border-b border-white/10">
         <h3 className="text-white/90 font-medium text-sm uppercase tracking-wide">

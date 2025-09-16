@@ -22,12 +22,12 @@ const Workspace: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div className="h-screen bg-black flex flex-col overflow-hidden">
       {/* Workspace Header */}
       <WorkspaceHeader />
       
       {/* Main Workspace */}
-      <div className="flex-1 flex pt-14">
+      <div className="flex-1 flex pt-14 overflow-hidden">
         {/* Sidebar */}
         <div className="w-16 bg-gray-900/70 border-r border-white/5 flex flex-col items-center py-4 gap-2">
           {/* Activity Bar */}
@@ -49,7 +49,7 @@ const Workspace: React.FC = () => {
         <FileExplorer />
 
         {/* Main Editor Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Editor Tabs */}
           <div className="bg-gray-800/30 border-b border-white/10 px-4 py-1">
             <div className="flex items-center gap-1 text-xs text-white/60">
@@ -64,7 +64,7 @@ const Workspace: React.FC = () => {
         </div>
 
         {/* Right Panel (Optional - for AI analysis, errors, etc.) */}
-        <div className="w-80 bg-gray-900/50 border-l border-white/10 flex flex-col">
+        <div className="w-80 bg-gray-900/50 border-l border-white/10 flex flex-col overflow-y-auto">
           <div className="p-4 border-b border-white/10">
             <h3 className="text-white/90 font-medium text-sm mb-3">AI Analysis</h3>
             <div className="space-y-2">

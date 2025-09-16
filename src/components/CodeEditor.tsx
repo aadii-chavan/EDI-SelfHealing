@@ -81,7 +81,7 @@ const CodeEditor: React.FC = () => {
 
   if (!activeFile) {
     return (
-      <div className="flex-1 bg-gray-900/30 flex items-center justify-center">
+      <div className="flex-1 bg-gray-900/30 flex items-center justify-center overflow-hidden">
         <div className="text-center">
           <FileText className="w-16 h-16 text-white/20 mx-auto mb-4" />
           <h3 className="text-white/60 text-lg mb-2">No file selected</h3>
@@ -93,7 +93,7 @@ const CodeEditor: React.FC = () => {
 
   if (activeFile.type === 'folder') {
     return (
-      <div className="flex-1 bg-gray-900/30 flex items-center justify-center">
+      <div className="flex-1 bg-gray-900/30 flex items-center justify-center overflow-hidden">
         <div className="text-center">
           <FileText className="w-16 h-16 text-white/20 mx-auto mb-4" />
           <h3 className="text-white/60 text-lg mb-2">Folder selected</h3>
@@ -104,7 +104,7 @@ const CodeEditor: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 bg-gray-900/30 flex flex-col">
+    <div className="flex-1 bg-gray-900/30 flex flex-col overflow-hidden">
       {/* Tab Bar */}
       <div className="bg-gray-800/50 border-b border-white/10 px-4 py-2">
         <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ const CodeEditor: React.FC = () => {
       </div>
 
       {/* Editor Content */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex items-center gap-2 text-white/60">
