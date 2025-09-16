@@ -22,7 +22,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <ProjectProvider>
-        <RouterProvider router={router} />
+        <RouterProvider 
+          router={router} 
+          future={{
+            v7_startTransition: true,
+          }}
+        />
       </ProjectProvider>
     </AuthProvider>
   </StrictMode>

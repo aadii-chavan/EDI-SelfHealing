@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import JSZip from 'jszip';
 
 export interface FileNode {
   name: string;
@@ -23,7 +24,9 @@ interface ProjectContextType {
   currentProject: Project | null;
   activeFile: FileNode | null;
   isLoading: boolean;
+  zipProgress: number | null;
   importProject: (repoUrl: string) => Promise<void>;
+  importProjectFromZip: (file: File) => Promise<void>;
   setCurrentProject: (project: Project) => void;
   setActiveFile: (file: FileNode) => void;
   getFileContent: (path: string) => Promise<string>;
@@ -48,6 +51,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [activeFile, setActiveFile] = useState<FileNode | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [zipProgress, setZipProgress] = useState<number | null>(null);
 
   // Parse GitHub URL to extract owner and repo
   const parseGitHubUrl = (url: string): { owner: string; repo: string } | null => {
@@ -92,11 +96,24 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     }
   };
 
+  const getGithubHeaders = (): HeadersInit => {
+    const token = localStorage.getItem('github_token') || import.meta.env.VITE_GITHUB_TOKEN;
+    const headers: HeadersInit = {
+      Accept: 'application/vnd.github+json',
+    };
+    if (token) {
+      (headers as any).Authorization = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
   // Fetch repository structure from GitHub API
   const fetchRepositoryStructure = async (owner: string, repo: string): Promise<FileNode[]> => {
     try {
       // First, check if the repository exists
-      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+      const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}` , {
+        headers: getGithubHeaders(),
+      });
       
       if (!repoResponse.ok) {
         if (repoResponse.status === 404) {
@@ -112,7 +129,9 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       const defaultBranch = repoData.default_branch || 'main';
       
       // Try to fetch the file tree using the default branch
-      let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`);
+      let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`, {
+        headers: getGithubHeaders(),
+      });
       
       if (!response.ok) {
         // If default branch fails, try common branch names
@@ -122,7 +141,9 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
         for (const branch of branches) {
           if (branch === defaultBranch) continue; // Skip the one we already tried
           
-          response = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`);
+          response = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`, {
+            headers: getGithubHeaders(),
+          });
           if (response.ok) {
             success = true;
             break;
@@ -187,9 +208,26 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       throw new Error('No current project');
     }
 
+    // If this is an uploaded project, read from in-memory tree
+    if (currentProject.owner === 'local' && currentProject.url === 'upload') {
+      const findNode = (nodes: FileNode[], target: string): FileNode | null => {
+        for (const node of nodes) {
+          if (node.path === target) return node;
+          if (node.type === 'folder' && node.children) {
+            const found = findNode(node.children, target);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      const node = findNode(currentProject.files, path);
+      return node?.content ?? '';
+    }
+
     try {
       const response = await fetch(
-        `https://api.github.com/repos/${currentProject.owner}/${currentProject.repo}/contents/${path}`
+        `https://api.github.com/repos/${currentProject.owner}/${currentProject.repo}/contents/${path}`,
+        { headers: getGithubHeaders() }
       );
       
       if (!response.ok) {
@@ -250,12 +288,96 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     }
   };
 
+  // Import project from uploaded ZIP
+  const importProjectFromZip = async (file: File): Promise<void> => {
+    setIsLoading(true);
+    setZipProgress(0);
+    try {
+      const zip = await JSZip.loadAsync(file);
+      const rootNodes: FileNode[] = [];
+      const pathMap = new Map<string, FileNode>();
+
+      const ensureFolder = (folderPath: string) => {
+        if (pathMap.has(folderPath)) return pathMap.get(folderPath)!;
+        const segments = folderPath.split('/');
+        let currentPath = '';
+        let parent: FileNode[] = rootNodes;
+        for (let i = 0; i < segments.length; i++) {
+          const seg = segments[i];
+          if (!seg) continue;
+          currentPath = currentPath ? `${currentPath}/${seg}` : seg;
+          let node = pathMap.get(currentPath);
+          if (!node) {
+            node = { name: seg, path: currentPath, type: 'folder', children: [] };
+            pathMap.set(currentPath, node);
+            parent.push(node);
+          }
+          parent = node.children!;
+        }
+        return pathMap.get(folderPath)!;
+      };
+
+      const allEntries = Object.keys(zip.files);
+      const fileEntries = allEntries.filter(p => !zip.files[p].dir);
+      const total = fileEntries.length || 1;
+      let processed = 0;
+
+      for (const entryPath of allEntries) {
+        const entry = zip.files[entryPath];
+        if (entry.dir) {
+          ensureFolder(entryPath.replace(/\/$/, ''));
+          continue;
+        }
+        const folderPath = entryPath.includes('/') ? entryPath.substring(0, entryPath.lastIndexOf('/')) : '';
+        if (folderPath) ensureFolder(folderPath);
+        const content = await entry.async('text');
+        const fileNode: FileNode = {
+          name: entryPath.split('/').pop() || '',
+          path: entryPath,
+          type: 'file',
+          content,
+        };
+        pathMap.set(entryPath, fileNode);
+        if (folderPath && pathMap.has(folderPath)) {
+          pathMap.get(folderPath)!.children!.push(fileNode);
+        } else {
+          rootNodes.push(fileNode);
+        }
+        if (!entry.dir) {
+          processed += 1;
+          setZipProgress(Math.min(100, Math.round((processed / total) * 100)));
+        }
+      }
+
+      const project: Project = {
+        id: `upload/${file.name}`,
+        name: file.name.replace(/\.zip$/i, ''),
+        url: 'upload',
+        owner: 'local',
+        repo: file.name.replace(/\.zip$/i, ''),
+        files: rootNodes,
+        createdAt: new Date(),
+      };
+
+      setProjects(prev => [...prev, project]);
+      setCurrentProject(project);
+    } catch (error) {
+      console.error('Error importing ZIP:', error);
+      throw new Error('Failed to import ZIP file');
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setZipProgress(null), 500);
+    }
+  };
+
   const value = {
     projects,
     currentProject,
     activeFile,
     isLoading,
+    zipProgress,
     importProject,
+    importProjectFromZip,
     setCurrentProject,
     setActiveFile,
     getFileContent,

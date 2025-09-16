@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Upload, Github, Shield, Bug, Zap } from 'lucide-react';
 import Header from '../components/Header';
 import Orb from '../components/Orb';
 import GitHubImportModal from '../components/GitHubImportModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useProject } from '../contexts/ProjectContext';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const { importProjectFromZip, isLoading, zipProgress } = useProject();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const handleZipPick = () => fileInputRef.current?.click();
+
+  const handleZipSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await importProjectFromZip(file);
+      navigate('/workspace');
+    } finally {
+      e.target.value = '';
+    }
+  };
 
   const stats = [
     { label: 'Bugs Fixed', value: '127', icon: Bug },
@@ -99,10 +116,19 @@ const Dashboard: React.FC = () => {
                   <p className="text-white/70">Upload a ZIP file of your project for analysis</p>
                 </div>
               </div>
-              <button className="w-full py-4 px-6 rounded-xl bg-green-600/20 border border-green-500/40 text-green-300 hover:bg-green-600/30 hover:border-green-500/60 transition-colors duration-200 flex items-center justify-center gap-2">
+              <button onClick={handleZipPick} disabled={isLoading} className="w-full py-4 px-6 rounded-xl bg-green-600/20 border border-green-500/40 text-green-300 hover:bg-green-600/30 hover:border-green-500/60 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50">
                 <Upload className="w-5 h-5" />
                 Upload Files
               </button>
+              <input ref={fileInputRef} type="file" accept=".zip,application/zip" className="hidden" onChange={handleZipSelected} />
+              {typeof zipProgress === 'number' && (
+                <div className="mt-4">
+                  <div className="h-2 rounded bg-white/10 overflow-hidden">
+                    <div className="h-full bg-green-500 transition-all" style={{ width: `${zipProgress}%` }}></div>
+                  </div>
+                  <div className="mt-2 text-xs text-white/70 text-right">{zipProgress}%</div>
+                </div>
+              )}
             </div>
           </div>
 

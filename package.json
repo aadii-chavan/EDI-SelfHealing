@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "jszip": "3.10.1",
     "lucide-react": "^0.344.0",
     "mathjs": "^14.6.0",
     "ogl": "^1.0.11",

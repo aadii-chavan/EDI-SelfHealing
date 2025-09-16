@@ -10,6 +10,7 @@ interface GitHubImportModalProps {
 
 const GitHubImportModal: React.FC<GitHubImportModalProps> = ({ isOpen, onClose }) => {
   const [repoUrl, setRepoUrl] = useState('');
+  const [token, setToken] = useState<string>(localStorage.getItem('github_token') || '');
   const [error, setError] = useState<string | null>(null);
   const { importProject, isLoading } = useProject();
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const GitHubImportModal: React.FC<GitHubImportModalProps> = ({ isOpen, onClose }
     }
 
     try {
+      if (token && token !== localStorage.getItem('github_token')) {
+        localStorage.setItem('github_token', token);
+      }
       await importProject(repoUrl.trim());
       onClose();
       setRepoUrl('');
@@ -76,6 +80,21 @@ const GitHubImportModal: React.FC<GitHubImportModalProps> = ({ isOpen, onClose }
             />
             <p className="text-xs text-white/60 mt-1">
               Enter a public GitHub repository URL
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm text-white/80 mb-2">GitHub Token (optional)</label>
+            <input
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 disabled:opacity-50"
+              placeholder="ghp_..."
+            />
+            <p className="text-xs text-white/60 mt-1">
+              Token is stored locally to avoid GitHub rate limits.
             </p>
           </div>
 
