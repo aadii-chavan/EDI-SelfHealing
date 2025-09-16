@@ -79,6 +79,164 @@ const CodeEditor: React.FC = () => {
     }
   };
 
+  // Very lightweight syntax highlighter (no external libs)
+  // Covers common tokens for JS/TS/JSON/HTML/CSS/YAML/Markdown as a best-effort
+  const renderHighlightedCode = (source: string, language: string) => {
+    const lines = source.split('\n');
+
+    const highlightJsTs = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /\/\*[\s\S]*?\*\//g, className: 'text-gray-400' }, // block comments
+        { regex: /\/\/.*$/gm, className: 'text-gray-400' }, // line comments
+        { regex: /`(?:\\`|[^`])*`/g, className: 'text-yellow-300' }, // template strings
+        { regex: /'(?:\\'|[^'])*'|"(?:\\"|[^"])*"/g, className: 'text-green-300' }, // strings
+        { regex: /\b(?:true|false|null|undefined|NaN|Infinity)\b/g, className: 'text-purple-300' },
+        { regex: /\b(?:const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|new|class|extends|super|this|import|from|export|default|as|async|await|interface|type|implements|public|private|protected|readonly)\b/g, className: 'text-blue-300' },
+        { regex: /\b(?:number|string|boolean|any|void|unknown|never|object|Record|Array|Promise|Map|Set)\b/g, className: 'text-sky-300' },
+        { regex: /\b\d+(?:\.\d+)?\b/g, className: 'text-orange-300' },
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightJson = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /"([^"\\]|\\.)*"(?=\s*:)/g, className: 'text-blue-300' }, // keys
+        { regex: /"([^"\\]|\\.)*"/g, className: 'text-green-300' }, // strings
+        { regex: /\b\d+(?:\.\d+)?\b/g, className: 'text-orange-300' },
+        { regex: /\b(?:true|false|null)\b/g, className: 'text-purple-300' },
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightHtml = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /<\/?[a-zA-Z0-9\-]+/g, className: 'text-blue-300' }, // tag name
+        { regex: /\s+[a-zA-Z_:][a-zA-Z0-9_:\-]*(?==)/g, className: 'text-purple-300' }, // attr name
+        { regex: /=\s*"[^"]*"|=\s*'[^']*'/g, className: 'text-green-300' }, // attr value
+        { regex: />/g, className: 'text-blue-300' },
+        { regex: /<!--([\s\S]*?)-->/g, className: 'text-gray-400' },
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightCss = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /\/\*[\s\S]*?\*\//g, className: 'text-gray-400' },
+        { regex: /#[0-9a-fA-F]{3,8}\b/g, className: 'text-orange-300' }, // hex colors
+        { regex: /\b\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw)\b/g, className: 'text-orange-300' },
+        { regex: /:[\s]*[a-zA-Z\-]+(?=\s*;)/g, className: 'text-green-300' }, // property values
+        { regex: /\b[a-zA-Z\-]+(?=\s*:)/g, className: 'text-blue-300' }, // property names
+        { regex: /\.[a-zA-Z_][\w\-]*/g, className: 'text-purple-300' }, // class selectors
+        { regex: /#[a-zA-Z_][\w\-]*/g, className: 'text-purple-300' }, // id selectors
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightPython = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /#.*/g, className: 'text-gray-400' }, // comments
+        { regex: /"""[\s\S]*?"""|'''[\s\S]*?'''/g, className: 'text-yellow-300' }, // triple-quoted strings
+        { regex: /'(?:\\'|[^'])*'|"(?:\\"|[^"])*"/g, className: 'text-green-300' }, // strings
+        { regex: /\b(?:def|class|return|if|elif|else|for|while|try|except|finally|with|as|import|from|pass|break|continue|lambda|yield|global|nonlocal|assert|del|raise|in|is|not|and|or)\b/g, className: 'text-blue-300' }, // keywords
+        { regex: /\b(?:True|False|None)\b/g, className: 'text-purple-300' },
+        { regex: /\b(?:int|float|str|list|dict|set|tuple|Any|List|Dict|Optional|Union)\b/g, className: 'text-sky-300' },
+        { regex: /\b(?:print|len|range|open|input|type|isinstance|enumerate|zip|map|filter|sum|min|max|abs|sorted)\b/g, className: 'text-sky-300' },
+        { regex: /\b\d+(?:\.\d+)?\b/g, className: 'text-orange-300' }, // numbers
+        { regex: /@[a-zA-Z_][\w]*/g, className: 'text-pink-300' }, // decorators
+        { regex: /\b(?:from|import)\b\s+[a-zA-Z_][\w\.]*/g, className: 'text-emerald-300' }, // imports
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightYaml = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /#.*/g, className: 'text-gray-400' },
+        { regex: /\b(?:true|false|null)\b/g, className: 'text-purple-300' },
+        { regex: /\b\d+(?:\.\d+)?\b/g, className: 'text-orange-300' },
+        { regex: /\b[a-zA-Z_][\w\-]*\s*:/g, className: 'text-blue-300' },
+        { regex: /"([^"\\]|\\.)*"|'([^'\\]|\\.)*'/g, className: 'text-green-300' },
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const highlightMarkdown = (text: string) => {
+      const patterns: Array<{ regex: RegExp; className: string }> = [
+        { regex: /^\s*#+\s.*$/gm, className: 'text-blue-300' }, // headings
+        { regex: /\*\*([^*]+)\*\*|__([^_]+)__/g, className: 'text-yellow-300' }, // bold
+        { regex: /\*([^*]+)\*|_([^_]+)_/g, className: 'text-purple-300' }, // italic
+        { regex: /`[^`]+`/g, className: 'text-green-300' }, // inline code
+        { regex: /\[[^\]]+\]\([^\)]+\)/g, className: 'text-sky-300' }, // links
+      ];
+      return applyPatterns(text, patterns);
+    };
+
+    const applyPatterns = (raw: string, patterns: Array<{ regex: RegExp; className: string }>) => {
+      // Split into tokens by progressively replacing matches with placeholders
+      type Segment = { text: string; className?: string };
+      let segments: Segment[] = [{ text: raw }];
+      patterns.forEach(({ regex, className }) => {
+        const next: Segment[] = [];
+        segments.forEach(seg => {
+          if (seg.className) {
+            next.push(seg);
+            return;
+          }
+          let lastIndex = 0;
+          const text = seg.text;
+          let match: RegExpExecArray | null;
+          const r = new RegExp(regex.source, regex.flags.includes('g') ? regex.flags : regex.flags + 'g');
+          while ((match = r.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              next.push({ text: text.slice(lastIndex, match.index) });
+            }
+            next.push({ text: match[0], className });
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            next.push({ text: text.slice(lastIndex) });
+          }
+        });
+        segments = next;
+      });
+      return segments;
+    };
+
+    const highlighterFor = (lang: string) => {
+      switch (lang) {
+        case 'javascript':
+        case 'typescript':
+          return highlightJsTs;
+        case 'json':
+          return highlightJson;
+        case 'html':
+          return highlightHtml;
+        case 'css':
+          return highlightCss;
+        case 'python':
+          return highlightPython;
+        case 'yaml':
+          return highlightYaml;
+        case 'markdown':
+          return highlightMarkdown;
+        default:
+          return (t: string) => [{ text: t }];
+      }
+    };
+
+    const highlight = highlighterFor(language);
+
+    return lines.map((line, idx) => {
+      const parts = highlight(line);
+      return (
+        <div key={idx}>
+          {parts.map((part, i) => (
+            <span key={i} className={part.className}>{part.text}</span>
+          ))}
+        </div>
+      );
+    });
+  };
+
   if (!activeFile) {
     return (
       <div className="flex-1 bg-gray-900/30 flex items-center justify-center overflow-hidden">
@@ -159,7 +317,7 @@ const CodeEditor: React.FC = () => {
               {/* Code Content */}
               <div className="flex-1">
                 <pre className="font-mono text-sm text-white/90 p-4 leading-6 whitespace-pre-wrap">
-                  <code>{content || '// File is empty'}</code>
+                  {renderHighlightedCode(content || '// File is empty', getLanguageFromFileName(activeFile.name))}
                 </pre>
               </div>
             </div>
